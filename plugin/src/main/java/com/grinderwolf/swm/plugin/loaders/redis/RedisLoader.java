@@ -1,9 +1,9 @@
 package com.grinderwolf.swm.plugin.loaders.redis;
 
+import com.grinderwolf.swm.plugin.config.RedisConfig;
 import com.infernalsuite.aswm.api.exceptions.UnknownWorldException;
 import com.infernalsuite.aswm.api.exceptions.WorldLockedException;
 import com.infernalsuite.aswm.api.loaders.SlimeLoader;
-import com.grinderwolf.swm.plugin.config.DatasourcesConfig;
 import com.grinderwolf.swm.plugin.loaders.redis.util.StringByteCodec;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.sync.RedisCommands;
@@ -18,7 +18,7 @@ public class RedisLoader implements SlimeLoader {
     private static final byte TRUE = 0x1;
     private static final byte FALSE = 0x0;
 
-    public RedisLoader(DatasourcesConfig.RedisConfig config) {
+    public RedisLoader(RedisConfig config) {
         this.connection = RedisClient
             .create(config.getUri())
             .connect(StringByteCodec.INSTANCE)

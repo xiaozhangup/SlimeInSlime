@@ -2,7 +2,7 @@ package com.grinderwolf.swm.plugin.loaders.mongo;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.grinderwolf.swm.plugin.SWMPlugin;
-import com.grinderwolf.swm.plugin.config.DatasourcesConfig;
+import com.grinderwolf.swm.plugin.config.MongoDBConfig;
 import com.grinderwolf.swm.plugin.loaders.LoaderUtils;
 import com.grinderwolf.swm.plugin.loaders.UpdatableLoader;
 import com.grinderwolf.swm.plugin.log.Logging;
@@ -51,7 +51,7 @@ public class MongoLoader extends UpdatableLoader {
     private final String database;
     private final String collection;
 
-    public MongoLoader(DatasourcesConfig.MongoDBConfig config) throws MongoException {
+    public MongoLoader(MongoDBConfig config) throws MongoException {
         this.database = config.getDatabase();
         this.collection = config.getCollection();
 
@@ -96,7 +96,7 @@ public class MongoLoader extends UpdatableLoader {
                 Logging.warning("Make sure no other servers with older SWM versions are using this database.");
                 Logging.warning("Shut down the server to prevent your database from being updated.");
 
-                Bukkit.getScheduler().scheduleSyncDelayedTask(SWMPlugin.getInstance(), () -> {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(SWMPlugin.getInstance().getPlugin(), () -> {
                     while (documents.hasNext()) {
                         String name = documents.next().getString("name");
                         mongoCollection.updateOne(Filters.eq("name", name), Updates.set("locked", 0L));

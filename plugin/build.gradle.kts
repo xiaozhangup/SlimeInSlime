@@ -14,6 +14,9 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.0")
     implementation("commons-io:commons-io:2.11.0")
     compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+
+    compileOnly("org.projectlombok:lombok:1.18.20")
+    annotationProcessor("org.projectlombok:lombok:1.18.20")
 }
 
 tasks {

@@ -21,7 +21,7 @@ public class WorldUnlocker implements Listener {
         SlimeWorldInstance world = SlimeNMSBridge.instance().getInstance(event.getWorld());
 
         if (world != null) {
-            Bukkit.getScheduler().runTaskAsynchronously(SWMPlugin.getInstance(), () -> unlockWorld(world.getSlimeWorldMirror()));
+            Bukkit.getScheduler().runTaskAsynchronously(SWMPlugin.getInstance().getPlugin(), () -> unlockWorld(world.getSlimeWorldMirror()));
         }
     }
 
@@ -34,8 +34,8 @@ public class WorldUnlocker implements Listener {
             Logging.error("Failed to unlock world " + world.getName() + ". Retrying in 5 seconds. Stack trace:");
             ex.printStackTrace();
 
-            Bukkit.getScheduler().runTaskLaterAsynchronously(SWMPlugin.getInstance(), () -> unlockWorld(world), 100);
-        } catch (UnknownWorldException e) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(SWMPlugin.getInstance().getPlugin(), () -> unlockWorld(world), 100);
+        } catch (UnknownWorldException ignored) {
         }
     }
 }

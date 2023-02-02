@@ -1,7 +1,7 @@
 package com.grinderwolf.swm.plugin.loaders.mysql;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.grinderwolf.swm.plugin.config.DatasourcesConfig;
+import com.grinderwolf.swm.plugin.config.MysqlConfig;
 import com.grinderwolf.swm.plugin.loaders.LoaderUtils;
 import com.grinderwolf.swm.plugin.loaders.UpdatableLoader;
 import com.grinderwolf.swm.plugin.log.Logging;
@@ -53,14 +53,14 @@ public class MysqlLoader extends UpdatableLoader {
     private final Map<String, ScheduledFuture> lockedWorlds = new HashMap<>();
     private final HikariDataSource source;
 
-    public MysqlLoader(DatasourcesConfig.MysqlConfig config) throws SQLException {
+    public MysqlLoader(MysqlConfig config) throws SQLException {
         HikariConfig hikariConfig = new HikariConfig();
 
         String sqlUrl = config.getSqlUrl();
         sqlUrl = sqlUrl.replace("{host}", config.getHost());
         sqlUrl = sqlUrl.replace("{port}", String.valueOf(config.getPort()));
         sqlUrl = sqlUrl.replace("{database}", config.getDatabase());
-        sqlUrl = sqlUrl.replace("{usessl}", String.valueOf(config.isUsessl()));
+        sqlUrl = sqlUrl.replace("{usessl}", String.valueOf(config.isUseSsl()));
 
         hikariConfig.setJdbcUrl(sqlUrl);
 //        hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase() + "?autoReconnect=true&allowMultiQueries=true&useSSL=" + config.isUsessl());

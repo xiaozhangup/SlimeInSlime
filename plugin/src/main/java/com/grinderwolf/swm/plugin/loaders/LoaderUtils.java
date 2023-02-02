@@ -1,17 +1,12 @@
 package com.grinderwolf.swm.plugin.loaders;
 
-import com.infernalsuite.aswm.api.loaders.SlimeLoader;
-import com.grinderwolf.swm.plugin.config.ConfigManager;
-import com.grinderwolf.swm.plugin.config.DatasourcesConfig;
-import com.grinderwolf.swm.plugin.loaders.file.FileLoader;
+import com.grinderwolf.swm.plugin.config.*;
 import com.grinderwolf.swm.plugin.loaders.mongo.MongoLoader;
 import com.grinderwolf.swm.plugin.loaders.mysql.MysqlLoader;
 import com.grinderwolf.swm.plugin.loaders.redis.RedisLoader;
 import com.grinderwolf.swm.plugin.log.Logging;
-import com.mongodb.MongoException;
-import io.lettuce.core.RedisException;
+import com.infernalsuite.aswm.api.loaders.SlimeLoader;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -24,59 +19,28 @@ public class LoaderUtils {
     public static final long MAX_LOCK_TIME = 300000L; // Max time difference between current time millis and world lock
     public static final long LOCK_INTERVAL = 60000L;
 
-    private static final Map<String, SlimeLoader> loaderMap = new HashMap<>();
+    private static final Map<DataSource, SlimeLoader> loaderMap = new HashMap<>();
 
-    public static void registerLoaders() {
-        DatasourcesConfig config = ConfigManager.getDatasourcesConfig();
+    public static void registerLoaders(DataSourceConfig config) throws SQLException {
+        SlimeLoader loadSystem = switch (config.getType()) {
+            case MYSQL -> new MysqlLoader((MysqlConfig) config);
+            case MONGO -> new MongoLoader((MongoDBConfig) config);
+            case REDIS -> new RedisLoader((RedisConfig) config);
+        };
 
-        // File loader
-        DatasourcesConfig.FileConfig fileConfig = config.getFileConfig();
-        registerLoader("file", new FileLoader(new File(fileConfig.getPath())));
-
-        // Mysql loader
-        DatasourcesConfig.MysqlConfig mysqlConfig = config.getMysqlConfig();
-        if (mysqlConfig.isEnabled()) {
-            try {
-                registerLoader("mysql", new MysqlLoader(mysqlConfig));
-            } catch (SQLException ex) {
-                Logging.error("Failed to establish connection to the MySQL server:");
-                ex.printStackTrace();
-            }
-        }
-
-        // MongoDB loader
-        DatasourcesConfig.MongoDBConfig mongoConfig = config.getMongoDbConfig();
-
-        if (mongoConfig.isEnabled()) {
-            try {
-                registerLoader("mongodb", new MongoLoader(mongoConfig));
-            } catch (MongoException ex) {
-                Logging.error("Failed to establish connection to the MongoDB server:");
-                ex.printStackTrace();
-            }
-        }
-
-        DatasourcesConfig.RedisConfig redisConfig = config.getRedisConfig();
-        if(redisConfig.isEnabled()){
-          try{
-            registerLoader("redis", new RedisLoader(redisConfig));
-          }catch (RedisException ex){
-            Logging.error("Failed to establish connection to the Redis server:");
-            ex.printStackTrace();
-          }
-        }
+        registerLoader(config.getType(), loadSystem);
     }
 
-    public static List<String> getAvailableLoadersNames() {
+    public static List<DataSource> getAvailableLoadersNames() {
         return new LinkedList<>(loaderMap.keySet());
     }
 
 
-    public static SlimeLoader getLoader(String dataSource) {
-        return loaderMap.get(dataSource);
+    public static SlimeLoader getLoader() {
+        return loaderMap.values().stream().findFirst().get();
     }
 
-    public static void registerLoader(String dataSource, SlimeLoader loader) {
+    public static void registerLoader(DataSource dataSource, SlimeLoader loader) {
         if (loaderMap.containsKey(dataSource)) {
             throw new IllegalArgumentException("Data source " + dataSource + " already has a declared loader!");
         }
